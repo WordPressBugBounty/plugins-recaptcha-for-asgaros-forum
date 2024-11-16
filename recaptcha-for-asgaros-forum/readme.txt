@@ -8,9 +8,9 @@ Author: Hitesh Chandwani
 Tags: reCAPTCHA for Asgaros Forum, Asgaros Forum reCAPTCHA, Asgaros Forum Captcha, Asgaros Forum Captcha add-on, Asgaros Forum reCAPTCHA v2, Asgaros Forum
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
-Version: 1.0.7
+Version: 1.0.8
 Requires at least: 4.7
-Tested up to: 6.4
+Tested up to: 6.7
 Stable tag: 1.0.4
 
 == Description ==
@@ -27,6 +27,9 @@ Stable tag: 1.0.4
 2. This is how it looks on front-end.
 
 == Changelog ==
+
+= 1.0.8 =
+* testing on new version
 
 = 1.0.7 =
 * Minor bug fix
