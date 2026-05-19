@@ -7,10 +7,10 @@ Author: Hitesh Chandwani
 Tags: reCAPTCHA for Asgaros Forum, Asgaros Forum reCAPTCHA, Asgaros Forum Captcha add-on, Asgaros Forum reCAPTCHA v2, Asgaros Forum
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
-Version: 1.0.8
+Version: 1.1.0
 Requires at least: 4.7
-Tested up to: 6.7
-Stable tag: 1.0.4
+Tested up to: 6.9
+Stable tag: 1.1.0
 
 A free plugin (add-on) for Asgaros Forum that allow you to easily add Google reCAPTCHA v2 or Google reCAPTCHA v3 on your Asgaros Forum.
 
@@ -28,6 +28,12 @@ A free plugin (add-on) for Asgaros Forum that allow you to easily add Google reC
 2. This is how it looks on front-end.
 
 == Changelog ==
+
+= 1.1.0 =
+* Security fixes and hardening improvements.
+* Fixed settings authorization and escaping issues.
+* Improved input sanitization and validation.
+* Fixed compatibility with Asgaros Forum latest version.
 
 = 1.0.8 =
 * Testing on new version

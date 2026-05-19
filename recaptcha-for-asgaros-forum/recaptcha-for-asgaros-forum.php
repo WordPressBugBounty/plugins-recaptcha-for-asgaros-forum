@@ -4,9 +4,11 @@ Plugin Name: reCAPTCHA (v2 & v3) for Asgaros Forum
 Plugin URI: http://wordpress.org/plugins/recaptcha-for-asgaros-forum/
 Description: Protect your Asgaros forum from spam using Googles reCAPTCHA v2 and v3. This plugin prevent bots to spam your forum and has option to enabe reCAPTCHA for guest users & logged-in users.
 Author: Hitesh Chandwani
-Version: 1.0.8
+Version: 1.1.0
 Author URI: https://hiteshchandwani.com
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 $plugin = plugin_basename(__FILE__); 
 
@@ -23,9 +25,9 @@ function rfaf_clear_data() {
 register_deactivation_hook( __FILE__, 'rfaf_clear_data' );
 
 function rfaf_add_admin_submenu() {
-	add_submenu_page( 'asgarosforum-structure', 'reCAPTCHA', 'reCAPTCHA', 'read', 'asgaros-recaptcha', 'rfaf_recaptcha_callback' );
+	add_submenu_page( 'asgarosforum-structure', 'reCAPTCHA', 'reCAPTCHA', 'manage_options', 'asgaros-recaptcha', 'rfaf_recaptcha_callback' );
 }
-add_action( 'admin_menu', 'rfaf_add_admin_submenu' );
+add_action( 'asgarosforum_add_admin_submenu_page', 'rfaf_add_admin_submenu' );
 
 function rfaf_recaptcha_callback() {
 	require( 'recaptcha.php' );
@@ -33,33 +35,37 @@ function rfaf_recaptcha_callback() {
 
 function rfaf_save_recaptcha_setting() {
 
-	if( isset( $_POST['rfaf_recaptcha_submit'] ) ):
-		$nonce = $_REQUEST['_wpnonce'];
-		if(wp_verify_nonce($nonce, 'rfaf_recaptcha_submit_nonce')) {
-			$rfaf_recaptcha_version = sanitize_text_field($_POST['rfaf_recaptcha_version']);
-			$rfaf_recaptcha_site_key = sanitize_text_field($_POST['rfaf_recaptcha_site_key']);
-			$rfaf_recaptcha_server_key = sanitize_text_field($_POST['rfaf_recaptcha_server_key']);
-			$rfaf_recaptcha_language = sanitize_text_field($_POST['rfaf_recaptcha_language']);
-			$rfaf_recaptcha_v3_site_key = sanitize_text_field($_POST['rfaf_recaptcha_v3_site_key']);
-			$rfaf_recaptcha_v3_server_key = sanitize_text_field($_POST['rfaf_recaptcha_v3_server_key']);
-			$rfaf_recaptcha_v3_score = sanitize_text_field($_POST['rfaf_recaptcha_v3_score']);
-			$rfaf_recaptcha_registerd_user = 0;
-			if( isset( $_POST['rfaf_recaptcha_registerd_user'] ) ){
-				$rfaf_recaptcha_registerd_user = sanitize_text_field( $_POST['rfaf_recaptcha_registerd_user'] );
-			}
+	if ( ! current_user_can('manage_options') ) {
+		wp_die('Unauthorized');
+	}
 
-			update_option( 'rfaf_recaptcha_version', $rfaf_recaptcha_version);
-			update_option( 'rfaf_recaptcha_site_key', $rfaf_recaptcha_site_key);
-			update_option( 'rfaf_recaptcha_server_key', $rfaf_recaptcha_server_key);
-			update_option( 'rfaf_recaptcha_language', $rfaf_recaptcha_language);
-			update_option( 'rfaf_recaptcha_v3_site_key', $rfaf_recaptcha_v3_site_key);
-			update_option( 'rfaf_recaptcha_v3_server_key', $rfaf_recaptcha_v3_server_key);
-			update_option( 'rfaf_recaptcha_v3_score', $rfaf_recaptcha_v3_score);
-			update_option( 'rfaf_recaptcha_registerd_user', $rfaf_recaptcha_registerd_user);
-		} else {
-			$_REQUEST['nonce_error'] = true;
-		}
-	endif;
+	if ( ! isset($_POST['rfaf_recaptcha_submit']) ) {
+        return;
+    }
+
+    check_admin_referer('rfaf_recaptcha_submit_nonce');
+
+	$rfaf_recaptcha_version = sanitize_text_field(wp_unslash($_POST['rfaf_recaptcha_version']));
+	$rfaf_recaptcha_site_key = sanitize_text_field(wp_unslash($_POST['rfaf_recaptcha_site_key']));
+	$rfaf_recaptcha_server_key = sanitize_text_field(wp_unslash($_POST['rfaf_recaptcha_server_key']));
+	$rfaf_recaptcha_language = sanitize_text_field(wp_unslash($_POST['rfaf_recaptcha_language']));
+	$rfaf_recaptcha_v3_site_key = sanitize_text_field(wp_unslash($_POST['rfaf_recaptcha_v3_site_key']));
+	$rfaf_recaptcha_v3_server_key = sanitize_text_field(wp_unslash($_POST['rfaf_recaptcha_v3_server_key']));
+	$rfaf_recaptcha_v3_score = sanitize_text_field(wp_unslash($_POST['rfaf_recaptcha_v3_score']));
+	$rfaf_recaptcha_registerd_user = 0;
+
+	if( isset( $_POST['rfaf_recaptcha_registerd_user'] ) ){
+		$rfaf_recaptcha_registerd_user = sanitize_text_field( wp_unslash($_POST['rfaf_recaptcha_registerd_user']) );
+	}
+
+	update_option( 'rfaf_recaptcha_version', $rfaf_recaptcha_version);
+	update_option( 'rfaf_recaptcha_site_key', $rfaf_recaptcha_site_key);
+	update_option( 'rfaf_recaptcha_server_key', $rfaf_recaptcha_server_key);
+	update_option( 'rfaf_recaptcha_language', $rfaf_recaptcha_language);
+	update_option( 'rfaf_recaptcha_v3_site_key', $rfaf_recaptcha_v3_site_key);
+	update_option( 'rfaf_recaptcha_v3_server_key', $rfaf_recaptcha_v3_server_key);
+	update_option( 'rfaf_recaptcha_v3_score', $rfaf_recaptcha_v3_score);
+	update_option( 'rfaf_recaptcha_registerd_user', $rfaf_recaptcha_registerd_user);
 
 }
 add_action('wp_loaded', 'rfaf_save_recaptcha_setting');
@@ -87,16 +93,16 @@ function rfaf_bbp_captcha_integrate(){
 	$server_key_v3				= get_option( 'rfaf_recaptcha_v3_server_key', false );
 	$enable_for_registerd_user  = get_option( 'rfaf_recaptcha_registerd_user', false );
 
-	if($recaptcha_version == "version 3" and $server_key_v3 != false & $site_key_v3 != false & (($is_guest_enable != false and !is_user_logged_in()) or $enable_for_registerd_user != false)) {
+	if($recaptcha_version == "version 3" && $server_key_v3 != false && $site_key_v3 != false && (($is_guest_enable != false && !is_user_logged_in()) or $enable_for_registerd_user != false)) {
 		
 		echo "<input type='hidden' class='g-recaptcha-response' name='g-recaptcha-response'>";
-		wp_enqueue_script('rfaf-google-reCaptcha', "https://www.google.com/recaptcha/api.js?render=$site_key_v3");
-		wp_add_inline_script('rfaf-google-reCaptcha', "grecaptcha.ready(function() { grecaptcha.execute('$site_key_v3', {action: 'social'}).then(function(token) { jQuery('.g-recaptcha-response').val(token); }); });");
+		wp_enqueue_script('rfaf-google-reCaptcha', "https://www.google.com/recaptcha/api.js?render=".rawurlencode($site_key_v3));
+		wp_add_inline_script('rfaf-google-reCaptcha', "grecaptcha.ready(function() { grecaptcha.execute('".wp_json_encode($site_key_v3)."', {action: 'social'}).then(function(token) { jQuery('.g-recaptcha-response').val(token); }); });");
 
-	} else if($server_key != false & $site_key != false & (($is_guest_enable != false and !is_user_logged_in()) or $enable_for_registerd_user!=false)){
+	} else if($server_key != false && $site_key != false && (($is_guest_enable != false && !is_user_logged_in()) or $enable_for_registerd_user!=false)){
 		
 		echo '<div class="editor-row editor-row-captcha">';
-		echo "<div class='g-recaptcha' data-sitekey='$site_key'></div>";
+		echo "<div class='g-recaptcha' data-sitekey='".esc_attr($site_key)."'></div>";
 		echo '</div>';
 		$lang = esc_attr( get_option('rfaf_recaptcha_language', 'en') );
 		wp_enqueue_script( 'rfaf-google-reCaptcha', "https://www.google.com/recaptcha/api.js?hl=$lang");	
@@ -118,14 +124,14 @@ function rfaf_validate_recaptcha( $status ){
 	$recaptcha_v3_score			= (float) get_option( 'rfaf_recaptcha_v3_score', 0.5 );
 	$enable_for_registerd_user  = get_option( 'rfaf_recaptcha_registerd_user', false );
 
-	if( $recaptcha_version == "version 3" and $server_key_v3 != false & $site_key_v3 != false & (($is_guest_enable != false and !is_user_logged_in()) or $enable_for_registerd_user!=false)){
+	if( $recaptcha_version == "version 3" && $server_key_v3 != false && $site_key_v3 != false && (($is_guest_enable != false && !is_user_logged_in()) or $enable_for_registerd_user!=false)){
 		
 		include ( plugin_dir_path( __FILE__ ) .'src/autoload.php');	
 		
 		$recaptcha = new \ReCaptcha\ReCaptcha($server_key_v3);
-		$gRecaptchaResponse = $_POST['g-recaptcha-response'];
-		$remoteIp = $_SERVER['REMOTE_ADDR']; 
-		//echo gethostname();exit;
+		$gRecaptchaResponse = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
+		$remoteIp = filter_var(wp_unslash($_SERVER['REMOTE_ADDR']), FILTER_VALIDATE_IP);
+
 		$resp = $recaptcha->setExpectedAction('social')
 						  ->setScoreThreshold( $recaptcha_v3_score )
 						  ->verify($gRecaptchaResponse, $remoteIp); 
@@ -134,13 +140,13 @@ function rfaf_validate_recaptcha( $status ){
 			return false;
 		}
 
-	} else if( $server_key != false & $site_key != false & (($is_guest_enable != false and !is_user_logged_in()) or $enable_for_registerd_user!=false)){
+	} else if( $server_key != false && $site_key != false && (($is_guest_enable != false && !is_user_logged_in()) or $enable_for_registerd_user!=false)){
 		
 		include ( plugin_dir_path( __FILE__ ) .'src/autoload.php');	
 		
 		$recaptcha = new \ReCaptcha\ReCaptcha($server_key);
-		$gRecaptchaResponse = $_POST['g-recaptcha-response'];
-		$remoteIp = $_SERVER['REMOTE_ADDR']; 
+		$gRecaptchaResponse = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
+		$remoteIp = filter_var(wp_unslash($_SERVER['REMOTE_ADDR']), FILTER_VALIDATE_IP);
 
 		$resp = $recaptcha->verify($gRecaptchaResponse, $remoteIp); 
 		if (!$resp->isSuccess()) {

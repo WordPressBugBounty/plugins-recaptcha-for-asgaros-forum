@@ -1,4 +1,6 @@
 <?php 
+ 	if ( ! defined( 'ABSPATH' ) ) exit;
+ 	
 	$languages = array( 'en' => 'English', 'fr'=> 'French', 'fr-CA' => 'French (Canadian)', 'zh-HK' => 'Chinese (Hong Kong)', 'zh-CN' => 'Chinese (Simplified)', 'zh-TW' => 'Chinese (Traditional)', 'nl' => 'Dutch', 'hi' => 'Hindi', 'es' => 'Spanish' );
 	$recaptcha_version_2 = "";
 	$recaptcha_version_3 = "";
@@ -11,14 +13,7 @@
 
 ?>
 <div class="wrap">
-	<?php if(isset($_REQUEST['nonce_error'])):?>
-		<div id="message" class="error notice notice-success is-dismissible">
-			<p>Something went wrong!</p>
-			<button type="button" class="notice-dismiss">
-				<span class="screen-reader-text">Dismiss this notice.</span>
-			</button>
-		</div>
-	<?php elseif(isset($_POST['rfaf_recaptcha_submit'])):?>
+	<?php if(isset($_POST['rfaf_recaptcha_submit'])):?>
 		<div id="message" class="updated notice notice-success is-dismissible">
 			<p>Updated</p>
 			<button type="button" class="notice-dismiss">
