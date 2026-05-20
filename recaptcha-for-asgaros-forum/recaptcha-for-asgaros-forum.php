@@ -4,7 +4,7 @@ Plugin Name: reCAPTCHA (v2 & v3) for Asgaros Forum
 Plugin URI: http://wordpress.org/plugins/recaptcha-for-asgaros-forum/
 Description: Protect your Asgaros forum from spam using Googles reCAPTCHA v2 and v3. This plugin prevent bots to spam your forum and has option to enabe reCAPTCHA for guest users & logged-in users.
 Author: Hitesh Chandwani
-Version: 1.1.0
+Version: 1.1.1
 Author URI: https://hiteshchandwani.com
 */
 
@@ -35,13 +35,13 @@ function rfaf_recaptcha_callback() {
 
 function rfaf_save_recaptcha_setting() {
 
-	if ( ! current_user_can('manage_options') ) {
-		wp_die('Unauthorized');
-	}
-
 	if ( ! isset($_POST['rfaf_recaptcha_submit']) ) {
         return;
     }
+
+    if ( ! current_user_can('manage_options') ) {
+		wp_die('Unauthorized');
+	}
 
     check_admin_referer('rfaf_recaptcha_submit_nonce');
 
